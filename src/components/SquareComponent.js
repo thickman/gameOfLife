@@ -10,17 +10,17 @@ export default class SquareComponent extends React.Component {
     }
   }
 
-  render(){
+  handleChange(e) {
+    this.props.onStateChanged(this.props.x, this.props.y);
+  }
 
+  render(){
     const fillColour = this.state.isAlive
       ? 'green'
       : 'grey';
 
     const margin = 5;
     const size = 20;
-
-    console.log("x: "+this.props.x);
-    console.log("y: "+this.props.y);
 
     const inlineStyle = {
       x: this.props.x * 20 + margin + 'px',
@@ -30,18 +30,20 @@ export default class SquareComponent extends React.Component {
       fill:fillColour,
       strokeWidth:margin,
       stroke:'rgb(0,0,0)'
-
     }
-
-    //"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)"
-
     return <rect width={size+'px'} height={size+'px'} style={inlineStyle} />
-
   }
 
   step(){
     //calculate the step
     //if step changes notify board to change states of squares around me
+
+/*
+    if(neighbours changed){
+        this.handleChange();
+    }
+*/
+
   }
 
 }
