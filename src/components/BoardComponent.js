@@ -161,7 +161,15 @@ export default class BoardComponent extends React.Component {
     const newDataBoardPrint = arg.printIndexes(newDataBoard);
     console.log("oldDataBoardPrint: "+oldDataBoardPrint);
     console.log("newDataBoardPrint: "+newDataBoardPrint);
+
+
+
     //console.log("newDataBoard: "+newDataBoard);
+
+
+    arg.setState({
+      dataBoard: newDataBoard
+    })
     return newDataBoard;
   }
 
