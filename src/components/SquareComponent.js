@@ -4,12 +4,6 @@ export default class SquareComponent extends React.Component {
 
   constructor(props){
     super(props);
-
-
-  }
-
-  handleChange(e) {
-    this.props.onStateChanged(this.props.x, this.props.y);
   }
 
   render(){
@@ -31,27 +25,4 @@ export default class SquareComponent extends React.Component {
     }
     return <rect width={size+'px'} height={size+'px'} style={inlineStyle} />
   }
-
-  calculate(){
-
-    //current
-    //next
-    //neighbours[]
-
-
-    //if(current.isAlive  && neighnours=
-  }
-
-  step(){
-    //calculate the step
-    //if step changes notify board to change states of squares around me
-
-/*
-    if(neighbours changed){
-        this.handleChange();
-    }
-*/
-
-  }
-
 }

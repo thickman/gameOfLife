@@ -14,13 +14,6 @@ export default class BoardComponent extends React.Component {
     }
 
     this.initializeBoard();
-
-
-  }
-
-  onSquareChanged(x, y){
-
-    //checkAffected()
   }
 
   initializeBoard(){
@@ -39,13 +32,6 @@ export default class BoardComponent extends React.Component {
         i==4 && j==2 ||
         i==5 && j==2;
 
-
-      /*
-      arr.push(
-        // TODO: usunac to - ta linia tylko przy render, tutaj tworzyc tylko dataBoard
-        <SquareComponent key={'sqr_'+k} x={i} y={j} isAlive={makeAlive} onSquareChanged={this.onStateChanged}/>
-      )
-*/
       dataArr[k] = makeAlive ? true : false;
 
       i++;
@@ -60,8 +46,6 @@ export default class BoardComponent extends React.Component {
       viewBoard: arr,
       dataBoard: dataArr
     }
-
-
   }
 
   get2d(k){
@@ -129,7 +113,7 @@ export default class BoardComponent extends React.Component {
     return neighbours.filter(neighbour => (!!neighbour)).length
   }
 
-
+  // help function to make prinitng more readable
   printIndexes(array){
     const newDataBoardPrint = array.reduce((printableDataBoard, current, index) => {
       if(current){
@@ -137,7 +121,6 @@ export default class BoardComponent extends React.Component {
       }
       return printableDataBoard;
     }, [])
-
 
     return newDataBoardPrint;
   }
@@ -156,16 +139,10 @@ export default class BoardComponent extends React.Component {
       return makeAlive;
     })
 
-
     const oldDataBoardPrint = arg.printIndexes(arg.state.dataBoard);
     const newDataBoardPrint = arg.printIndexes(newDataBoard);
     console.log("oldDataBoardPrint: "+oldDataBoardPrint);
     console.log("newDataBoardPrint: "+newDataBoardPrint);
-
-
-
-    //console.log("newDataBoard: "+newDataBoard);
-
 
     arg.setState({
       dataBoard: newDataBoard
@@ -173,12 +150,7 @@ export default class BoardComponent extends React.Component {
     return newDataBoard;
   }
 
-  onChangeState(x, y) {
-
-  }
-
   render(){
-    //const speed = this.props.speed;
 
     const fillColour = 'yellow';
 
@@ -189,23 +161,12 @@ export default class BoardComponent extends React.Component {
     }
 
     console.log("dataBoard: "+ this.state.dataBoard);
-
-    //const one = this.liveNeighboursOf(1,3);
-    //const two = this.liveNeighboursOf(3,2);
-    //const three = this.liveNeighboursOf(2,2);
-
-    //console.log("one: "+one);
-    //console.log("two: "+two);
-    //console.log("three: "+three);
-
     setTimeout(this.calculateNewState, this.state.speed, this);
 
     return (<svg>
       {
         this.state.dataBoard.map((square, index) => {
-          //console.log("index: "+index);
           const xy = this.get2d(index);
-          //console.log("xy: "+JSON.stringify(xy));
           return (
             <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square}/>
           )
