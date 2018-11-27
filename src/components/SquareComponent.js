@@ -5,9 +5,7 @@ export default class SquareComponent extends React.Component {
   constructor(props){
     super(props);
 
-    this.state = {
-      isAlive: !!props.isAlive
-    }
+
   }
 
   handleChange(e) {
@@ -15,7 +13,7 @@ export default class SquareComponent extends React.Component {
   }
 
   render(){
-    const fillColour = this.state.isAlive
+    const fillColour = this.props.isAlive
       ? 'green'
       : 'grey';
 
@@ -32,6 +30,16 @@ export default class SquareComponent extends React.Component {
       stroke:'rgb(0,0,0)'
     }
     return <rect width={size+'px'} height={size+'px'} style={inlineStyle} />
+  }
+
+  calculate(){
+
+    //current
+    //next
+    //neighbours[]
+
+
+    //if(current.isAlive  && neighnours=
   }
 
   step(){
