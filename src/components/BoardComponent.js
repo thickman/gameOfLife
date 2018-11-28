@@ -1,4 +1,4 @@
-import React,{Component} from 'react';
+import React from 'react';
 import SquareComponent from './SquareComponent'
 
 export default class BoardComponent extends React.Component {
@@ -37,26 +37,15 @@ export default class BoardComponent extends React.Component {
     })
   }
 
-  updateBoard(){
-
-  }
-
   initializeBoard(){
-
-    console.log("initializeBoard");
-    console.log("startingCells: "+JSON.stringify(this.state.startingCells));
-
-
-
     const dimension = this.state.dimension; // pass as props.dimension
-    const speed = 1;
 
-    const arr = [];
     const dataArr = [];
     let makeAlive = false;
 
     let i=0;
     let j=0;
+
 
     for(let k=0; k<dimension*dimension; k++) {
       makeAlive = this.state.startingCells.find(cell => cell.i === i && cell.j === j)
@@ -69,7 +58,7 @@ export default class BoardComponent extends React.Component {
       }
     }
     this.state  = {
-      ...this.state,      
+      ...this.state,
       dataBoard: dataArr
     }
   }
@@ -136,6 +125,7 @@ export default class BoardComponent extends React.Component {
   }
 
   // help function to make prinitng more readable
+  // usage: const oldDataBoardPrint = arg.printIndexes(arg.state.dataBoard);
   printIndexes(array){
     const newDataBoardPrint = array.reduce((printableDataBoard, current, index) => {
       if(current){
@@ -156,15 +146,10 @@ export default class BoardComponent extends React.Component {
 
       const makeAlive =
         (neighbourAmount === 3 && !isAlive) ||
-        ((neighbourAmount === 2 || neighbourAmount == 3) && isAlive);
+        ((neighbourAmount === 2 || neighbourAmount === 3) && isAlive);
 
       return makeAlive;
     })
-
-    const oldDataBoardPrint = arg.printIndexes(arg.state.dataBoard);
-    const newDataBoardPrint = arg.printIndexes(newDataBoard);
-    console.log("oldDataBoardPrint: "+oldDataBoardPrint);
-    console.log("newDataBoardPrint: "+newDataBoardPrint);
 
     arg.setState({
       dataBoard: newDataBoard
@@ -173,6 +158,8 @@ export default class BoardComponent extends React.Component {
   }
 
   onSquareClick(target){
+
+    if(this.state.isRunning) return;
 
     // we probably don't need to update that 2 lines as it's used only to initialise the board
     const cells = this.state.startingCells;

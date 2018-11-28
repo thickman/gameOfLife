@@ -1,10 +1,6 @@
-import React,{Component} from 'react';
+import React from 'react';
 
 export default class SquareComponent extends React.Component {
-
-  constructor(props){
-    super(props);
-  }
 
   onClick(e){
     this.props.onSquareClick({i: this.props.x, j: this.props.y});
