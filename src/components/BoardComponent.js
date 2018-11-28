@@ -9,7 +9,6 @@ export default class BoardComponent extends React.Component {
     this.state = {
       speed: 1500, //ms
       dimension: 10,
-      viewBoard: [],
       dataBoard: [],
       startingCells: [],
       isRunning: false
@@ -70,8 +69,7 @@ export default class BoardComponent extends React.Component {
       }
     }
     this.state  = {
-      ...this.state,
-      viewBoard: arr,
+      ...this.state,      
       dataBoard: dataArr
     }
   }
@@ -90,7 +88,6 @@ export default class BoardComponent extends React.Component {
   }
 
   liveNeighboursOf(i,j){
-    let viewBoard = this.state.viewBoard;
     let dataBoard = this.state.dataBoard;
     let width = this.state.dimension;
     let hasUp, hasDown, hasLeft, hasRight;
