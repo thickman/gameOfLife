@@ -11,8 +11,8 @@ export default class SquareComponent extends React.Component {
       ? 'green'
       : 'grey';
 
-    const margin = 5;
-    const size = 20;
+    const margin = this.props.margin;
+    const size = this.props.squareSize;
 
     const inlineStyle = {
       x: this.props.x * 20 + margin + 'px',

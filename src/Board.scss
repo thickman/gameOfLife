@@ -1,0 +1,26 @@
+.board-container{
+
+  .label {
+  }
+  .board {
+  }
+
+  .button-bar  {
+    display: block;
+    margin: 0 auto;
+
+    button {
+      width: 100px;
+      height: 40px;
+      color: black;
+      background-color: green;
+
+      &:disabled{
+          background-color: grey;
+      }
+      &:focus {
+        outline:0;
+      }
+    }
+  }
+}

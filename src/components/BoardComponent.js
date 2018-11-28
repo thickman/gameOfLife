@@ -1,5 +1,6 @@
 import React from 'react';
 import SquareComponent from './SquareComponent'
+import './../Board.scss';
 
 export default class BoardComponent extends React.Component {
 
@@ -11,7 +12,9 @@ export default class BoardComponent extends React.Component {
       dimension: 10,
       dataBoard: [],
       startingCells: [],
-      isRunning: false
+      isRunning: false,
+      squareSize: 20,
+      squareMargin: 5
     }
 
     this.setStartingCells();
@@ -171,7 +174,7 @@ export default class BoardComponent extends React.Component {
 
     this.setState({
       startingCells: cells,
-      dataArr: dataArr
+      dataBoard: dataArr
     })
   }
 
@@ -179,39 +182,50 @@ export default class BoardComponent extends React.Component {
     this.setState({isRunning: true});
   }
 
+  clearStartingPos(){
+    if(this.state.isRunning) return;
+
+    this.setState({
+      startingCells: [],
+      dataBoard: this.state.dataBoard.map(cell => false )
+    })
+  }
+
   render(){
     const fillColour = 'white';
 
-    const inlineStyle = {
-      width: '300px',
-      height: '300px',
-      'backgroundColor':fillColour
-    }
+    // can we avoid passing this here and this calculation in order to center
+    const svgSize = (this.state.squareSize) * this.state.dimension + 2* this.state.squareMargin;
 
-    const buttonInlineStyle = {
-      width: '100px',
-      height: '40px',
-      'color':'black',
-      'backgroundColor':'grey'
+    const inlineStyle = {
+      'backgroundColor':fillColour,
+      width:  `${svgSize}px`,
+      height: `${svgSize}px`
     }
 
     if(this.state.isRunning){
         setTimeout(this.calculateNewState, this.state.speed, this);
     }
 
+
+    //TODO: button stop/stats, print counter and startingCells[] (to reproduce interesting settings)
     return (
-      <div>
-        <svg style={inlineStyle}>
+      <div className='board-container'>
+        <div className='label'><p>Game of Life</p></div>
+        <svg className='board' style={inlineStyle}>
         {
           this.state.dataBoard.map((square, index) => {
             const xy = this.get2d(index);
             return (
-              <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square} onSquareClick={this.onSquareClick.bind(this)}/>
+              <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square} margin={this.state.squareMargin} squareSize={this.state.squareSize} onSquareClick={this.onSquareClick.bind(this)}/>
             )
           })
         }
         </svg>
-        <button style={buttonInlineStyle} onClick={this.runGame.bind(this)}>run game</button>
+        <div className = 'button-bar'>
+          <button disabled={this.state.isRunning} onClick={this.runGame.bind(this)}>run game</button>
+          <button disabled={this.state.isRunning} onClick={this.clearStartingPos.bind(this)}>clear board</button>
+        </div>
       </div>
     );
     }
