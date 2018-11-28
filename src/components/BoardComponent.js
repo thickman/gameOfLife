@@ -143,6 +143,9 @@ export default class BoardComponent extends React.Component {
 
 
   calculateNewState(arg){
+    if(!arg.state.dataBoard.find(cell => !!cell)){      
+      return;
+    }
 
     const newDataBoard = arg.state.dataBoard.map((isAlive, index) => {
       const xy = arg.get2d(index);
