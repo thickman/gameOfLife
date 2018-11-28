@@ -9,12 +9,13 @@ export default class BoardComponent extends React.Component {
 
     this.state = {
       speed: 1500, //ms
-      dimension: 10,
+      dimension: 20,
       dataBoard: [],
       startingCells: [],
       isRunning: false,
       squareSize: 20,
-      squareMargin: 5
+      squareMargin: 5,
+      counter: 0
     }
 
     this.setStartingCells();
@@ -22,17 +23,17 @@ export default class BoardComponent extends React.Component {
   }
 
   setStartingCells(){
-    this.addStartingCell(3,2);
-    this.addStartingCell(4,2);
-    this.addStartingCell(5,2);
-    this.addStartingCell(3,3);
+    const arr =
+      [[6,5],[6,6],[8,8],[8,9],[9,8],[9,9],[7,5],[7,6]]
+    ;
+    arr.forEach(cell => this.addStartingCell(cell[0], cell[1]));
   }
 
   addStartingCell(i, j){
     //ES6 shorthand object props assign
     // same as {i: i, j: j}
     const cells = this.state.startingCells;
-    cells.push(({i, j}));
+    cells.push(([i, j]));
 
     this.state = ({
       ...this.state,
@@ -51,7 +52,7 @@ export default class BoardComponent extends React.Component {
 
 
     for(let k=0; k<dimension*dimension; k++) {
-      makeAlive = this.state.startingCells.find(cell => cell.i === i && cell.j === j)
+      makeAlive = this.state.startingCells.find(cell => cell[0] === i && cell[1] === j)
       dataArr[k] = !!makeAlive;
       i++;
 
@@ -155,7 +156,8 @@ export default class BoardComponent extends React.Component {
     })
 
     arg.setState({
-      dataBoard: newDataBoard
+      dataBoard: newDataBoard,
+      counter: arg.state.counter+1
     })
     return newDataBoard;
   }
@@ -166,7 +168,7 @@ export default class BoardComponent extends React.Component {
 
     // we probably don't need to update that 2 lines as it's used only to initialise the board
     const cells = this.state.startingCells;
-    cells.push(({i: target.i, j: target.j}));
+    cells.push(([target.i, target.j]));
 
     let dataArr = this.state.dataBoard;
     const index = this.get1d(target.i, target.j);
@@ -191,6 +193,12 @@ export default class BoardComponent extends React.Component {
     })
   }
 
+  pauseGame(){
+    this.setState({
+      isRunning: false,
+     });
+  }
+
   render(){
     const fillColour = 'white';
 
@@ -207,8 +215,6 @@ export default class BoardComponent extends React.Component {
         setTimeout(this.calculateNewState, this.state.speed, this);
     }
 
-
-    //TODO: button stop/stats, print counter and startingCells[] (to reproduce interesting settings)
     return (
       <div className='board-container'>
         <div className='label'><p>Game of Life</p></div>
@@ -225,7 +231,10 @@ export default class BoardComponent extends React.Component {
         <div className = 'button-bar'>
           <button disabled={this.state.isRunning} onClick={this.runGame.bind(this)}>run game</button>
           <button disabled={this.state.isRunning} onClick={this.clearStartingPos.bind(this)}>clear board</button>
+          <button disabled={!this.state.isRunning} onClick={this.pauseGame.bind(this)}>pause</button>
         </div>
+        <p>Counter: {this.state.counter}</p>
+        <p>{JSON.stringify(this.state.startingCells)}</p>
       </div>
     );
     }
