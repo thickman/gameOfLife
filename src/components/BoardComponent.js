@@ -7,13 +7,33 @@ export default class BoardComponent extends React.Component {
     super(props);
 
     this.state = {
-      speed: 3000, //ms
+      speed: 1500, //ms
       dimension: 6,
       viewBoard: [],
       dataBoard: [],
+      startingCells: []
     }
 
+    this.setStartingCells();
     this.initializeBoard();
+  }
+
+  setStartingCells(){
+    this.addStartingCell(3,2);
+    this.addStartingCell(4,2);
+    this.addStartingCell(5,2);
+    this.addStartingCell(3,3);
+  }
+  addStartingCell(i, j){
+    //ES6 shorthand object props assign
+    // same as {i: i, j: j}
+    const cells = this.state.startingCells;
+    cells.push(({i, j}));
+
+    this.state = ({
+      ...this.state,
+      startingCells: cells
+    })
   }
 
   initializeBoard(){
@@ -28,12 +48,8 @@ export default class BoardComponent extends React.Component {
     let j=0;
 
     for(let k=0; k<dimension*dimension; k++) {
-      makeAlive = i==3 && j==2 ||
-        i==4 && j==2 ||
-        i==5 && j==2;
-
-      dataArr[k] = makeAlive ? true : false;
-
+      makeAlive = this.state.startingCells.find(cell => cell.i === i && cell.j === j)
+      dataArr[k] = !!makeAlive;
       i++;
 
       if(i >= dimension){
@@ -67,9 +83,6 @@ export default class BoardComponent extends React.Component {
     let width = this.state.dimension;
     let hasUp, hasDown, hasLeft, hasRight;
     const k = this.get1d(i, j);
-
-    //console.log("k: "+k);
-    //console.log("dataBoardOfMe: "+ dataBoard[k]);
 
     hasUp    = j > 0;
     hasDown  = j < width - 1;
