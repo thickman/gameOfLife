@@ -143,7 +143,7 @@ export default class BoardComponent extends React.Component {
 
 
   calculateNewState(arg){
-    if(!arg.state.dataBoard.find(cell => !!cell)){      
+    if(!arg.state.dataBoard.find(cell => !!cell)){
       return;
     }
 
@@ -170,12 +170,19 @@ export default class BoardComponent extends React.Component {
     if(this.state.isRunning) return;
 
     // we probably don't need to update that 2 lines as it's used only to initialise the board
-    const cells = this.state.startingCells;
-    cells.push(([target.i, target.j]));
+    let cells = this.state.startingCells;
+    const cellIndexInStartingArr = cells.findIndex(cell => (cell[0] === target.i && cell[1] === target.j));
+
+    if(cellIndexInStartingArr === -1){
+        cells.push(([target.i, target.j]));
+    }
+    else{
+      cells = cells.slice(0,cellIndexInStartingArr).concat(cells.slice(cellIndexInStartingArr+1, cells.length));
+    }
 
     let dataArr = this.state.dataBoard;
     const index = this.get1d(target.i, target.j);
-    dataArr[index] = true;
+    dataArr[index] = !dataArr[index];
 
     this.setState({
       startingCells: cells,
