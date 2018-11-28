@@ -8,10 +8,11 @@ export default class BoardComponent extends React.Component {
 
     this.state = {
       speed: 1500, //ms
-      dimension: 6,
+      dimension: 10,
       viewBoard: [],
       dataBoard: [],
-      startingCells: []
+      startingCells: [],
+      isRunning: false
     }
 
     this.setStartingCells();
@@ -24,6 +25,7 @@ export default class BoardComponent extends React.Component {
     this.addStartingCell(5,2);
     this.addStartingCell(3,3);
   }
+
   addStartingCell(i, j){
     //ES6 shorthand object props assign
     // same as {i: i, j: j}
@@ -36,7 +38,17 @@ export default class BoardComponent extends React.Component {
     })
   }
 
+  updateBoard(){
+
+  }
+
   initializeBoard(){
+
+    console.log("initializeBoard");
+    console.log("startingCells: "+JSON.stringify(this.state.startingCells));
+
+
+
     const dimension = this.state.dimension; // pass as props.dimension
     const speed = 1;
 
@@ -163,29 +175,60 @@ export default class BoardComponent extends React.Component {
     return newDataBoard;
   }
 
-  render(){
+  onSquareClick(target){
 
-    const fillColour = 'yellow';
+    // we probably don't need to update that 2 lines as it's used only to initialise the board
+    const cells = this.state.startingCells;
+    cells.push(({i: target.i, j: target.j}));
+
+    let dataArr = this.state.dataBoard;
+    const index = this.get1d(target.i, target.j);
+    dataArr[index] = true;
+
+    this.setState({
+      startingCells: cells,
+      dataArr: dataArr
+    })
+  }
+
+  runGame(){
+    this.setState({isRunning: true});
+  }
+
+  render(){
+    const fillColour = 'white';
 
     const inlineStyle = {
-      width: '400px',
-      height: '400px',
+      width: '300px',
+      height: '300px',
       'backgroundColor':fillColour
     }
 
-    console.log("dataBoard: "+ this.state.dataBoard);
-    setTimeout(this.calculateNewState, this.state.speed, this);
+    const buttonInlineStyle = {
+      width: '100px',
+      height: '40px',
+      'color':'black',
+      'backgroundColor':'grey'
+    }
 
-    return (<svg>
-      {
-        this.state.dataBoard.map((square, index) => {
-          const xy = this.get2d(index);
-          return (
-            <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square}/>
-          )
-        })
-      }
-      </svg>
+    if(this.state.isRunning){
+        setTimeout(this.calculateNewState, this.state.speed, this);
+    }
+
+    return (
+      <div>
+        <svg style={inlineStyle}>
+        {
+          this.state.dataBoard.map((square, index) => {
+            const xy = this.get2d(index);
+            return (
+              <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square} onSquareClick={this.onSquareClick.bind(this)}/>
+            )
+          })
+        }
+        </svg>
+        <button style={buttonInlineStyle} onClick={this.runGame.bind(this)}>run game</button>
+      </div>
     );
     }
 }

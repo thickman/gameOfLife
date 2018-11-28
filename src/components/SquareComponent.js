@@ -6,6 +6,10 @@ export default class SquareComponent extends React.Component {
     super(props);
   }
 
+  onClick(e){
+    this.props.onSquareClick({i: this.props.x, j: this.props.y});
+  }
+
   render(){
     const fillColour = this.props.isAlive
       ? 'green'
@@ -23,6 +27,6 @@ export default class SquareComponent extends React.Component {
       strokeWidth:margin,
       stroke:'rgb(0,0,0)'
     }
-    return <rect width={size+'px'} height={size+'px'} style={inlineStyle} />
+    return <rect width={size+'px'} height={size+'px'} style={inlineStyle} onClick={this.onClick.bind(this)}/>
   }
 }
