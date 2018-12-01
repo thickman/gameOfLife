@@ -9,7 +9,7 @@ export default class SquareComponent extends React.Component {
   render(){
     const fillColour = this.props.isAlive
       ? 'green'
-      : 'grey';
+      : 'rgba(0, 0, 0, 0.2)';
 
     const margin = this.props.margin;
     const size = this.props.squareSize;
