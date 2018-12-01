@@ -1,6 +1,7 @@
 import React from 'react';
 import SquareComponent from './SquareComponent'
 import './../Board.scss';
+import * as PatternLibrary from './PatternLibrary'
 
 export default class BoardComponent extends React.Component {
 
@@ -8,8 +9,8 @@ export default class BoardComponent extends React.Component {
     super(props);
 
     this.state = {
-      speed: 1500, //ms
-      dimension: 20,
+      speed: 1000, //ms
+      dimension: 40,
       dataBoard: [],
       startingCells: [],
       isRunning: false,
@@ -23,9 +24,7 @@ export default class BoardComponent extends React.Component {
   }
 
   setStartingCells(){
-    const arr =
-      [[6,5],[6,6],[8,8],[8,9],[9,8],[9,9],[7,5],[7,6]]
-    ;
+    const arr = PatternLibrary.TOAD;
     arr.forEach(cell => this.addStartingCell(cell[0], cell[1]));
   }
 
