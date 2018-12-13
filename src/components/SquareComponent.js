@@ -14,7 +14,7 @@ export default class SquareComponent extends React.Component {
     const margin = this.props.margin;
     const size = this.props.squareSize;
 
-    const inlineStyle = {
+    let inlineStyle = {
       x: this.props.x * 20 + margin + 'px',
       y: this.props.y * 20 + margin + 'px',
       width: size + 'px',
@@ -23,6 +23,11 @@ export default class SquareComponent extends React.Component {
       strokeWidth:margin,
       stroke:'rgb(0,0,0)'
     }
+
+    if(!this.props.isVisible){
+      inlineStyle = {...inlineStyle, stroke:'rgba(0,0,0, 0.15)'} // ultimately set display: none 
+    }
+
     return <rect width={size+'px'} height={size+'px'} style={inlineStyle} onClick={this.onClick.bind(this)}/>
   }
 }

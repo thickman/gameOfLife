@@ -9,14 +9,15 @@ export default class BoardComponent extends React.Component {
     super(props);
 
     this.state = {
-      speed: 100, //ms
-      dimension: 40,
+      speed: 2000, //ms
+      dimension: 10,
       dataBoard: [],
       startingCells: [],
       isRunning: false,
       squareSize: 20,
       squareMargin: 5,
-      counter: 0
+      counter: 0,
+      hiddenBorderSize: 3
     }
 
     this.setStartingCells();
@@ -24,13 +25,18 @@ export default class BoardComponent extends React.Component {
   }
 
   setStartingCells(){
-    const arr = PatternLibrary.GOSPER_GLIDER_GUN;
+
+    if(this.state.hiddenBorderSize * 2 >= this.state.dimension +2){
+      throw new Error("board dimension or hidden border size sets incorrectly")
+    }
+
+    const arr =
+      [[6,5],[6,6],[6,7],[5,7],[4,6]]
+
     arr.forEach(cell => this.addStartingCell(cell[0], cell[1]));
   }
 
   addStartingCell(i, j){
-    //ES6 shorthand object props assign
-    // same as {i: i, j: j}
     const cells = this.state.startingCells;
     cells.push(([i, j]));
 
@@ -79,8 +85,15 @@ export default class BoardComponent extends React.Component {
     return j* this.state.dimension + i;
   }
 
-  liveNeighboursOf(i,j){
-    let dataBoard = this.state.dataBoard;
+  /*
+  Problem pozostajacych na krawedzi resztek (np. glider zamienia sie w kwadrat zamiast odleciec poza board)
+
+  Mozna wyswietlac tablice o np. 2 elementy mniejsza z kazdej strony (x-4, y-4), wtedy resztki schowaja sie w obszarze
+  niewidocznym dla usera, a przy kazdym ruchu obszar niewidoczny zostaje czyszczony aby nie przyczepialy sie do niego nowe resztki
+  */
+
+
+  liveNeighboursOf(dataBoard, i,j){
     let width = this.state.dimension;
     let hasUp, hasDown, hasLeft, hasRight;
     const k = this.get1d(i, j);
@@ -97,24 +110,24 @@ export default class BoardComponent extends React.Component {
       : false;
 
     neighbours[1] = hasUp
-    ? dataBoard[k - width]
-    : false;
+      ? dataBoard[k - width]
+      : false;
 
     neighbours[2] = hasUp && hasRight
-    ? dataBoard[k - width + 1]
-    : false;
+      ? dataBoard[k - width + 1]
+      : false;
 
     neighbours[3] = hasLeft
-    ? dataBoard[k - 1]
-    : false;
+      ? dataBoard[k - 1]
+      : false;
 
     neighbours[4] = hasRight
-    ? dataBoard[k + 1]
-    : false;
+      ? dataBoard[k + 1]
+      : false;
 
     neighbours[5] = hasDown && hasLeft
-    ? dataBoard[k + width - 1]
-    : false;
+      ? dataBoard[k + width - 1]
+      : false;
 
     neighbours[6] = hasDown
       ? dataBoard[k + width]
@@ -146,9 +159,19 @@ export default class BoardComponent extends React.Component {
       return;
     }
 
-    const newDataBoard = arg.state.dataBoard.map((isAlive, index) => {
+    const boardClearBorder = arg.state.dataBoard.map((square, index) => {
       const xy = arg.get2d(index);
-      const neighbourAmount = arg.liveNeighboursOf(xy.i, xy.j);
+      const isBorderSquare = (xy.i < arg.state.hiddenBorderSize || xy.i > (arg.state.dimension - arg.state.hiddenBorderSize))
+      || (xy.j < arg.state.hiddenBorderSize || xy.j > (arg.state.dimension - arg.state.hiddenBorderSize))
+
+      return isBorderSquare
+        ? false
+        : square
+    });
+
+    const newDataBoard = boardClearBorder.map((isAlive, index) => {
+      const xy = arg.get2d(index);
+      const neighbourAmount = arg.liveNeighboursOf(boardClearBorder, xy.i, xy.j);
 
       const makeAlive =
         (neighbourAmount === 3 && !isAlive) ||
@@ -156,6 +179,11 @@ export default class BoardComponent extends React.Component {
 
       return makeAlive;
     })
+
+    console.log("----------");
+    console.log(arg.printIndexes(arg.state.dataBoard));
+    console.log(arg.printIndexes(boardClearBorder));
+    console.log(arg.printIndexes(newDataBoard));
 
     arg.setState({
       dataBoard: newDataBoard,
@@ -231,8 +259,11 @@ export default class BoardComponent extends React.Component {
         {
           this.state.dataBoard.map((square, index) => {
             const xy = this.get2d(index);
+            const isVisible = (xy.i >= this.state.hiddenBorderSize && xy.i <= (this.state.dimension - this.state.hiddenBorderSize))
+            && (xy.j >= this.state.hiddenBorderSize && xy.j <= (this.state.dimension - this.state.hiddenBorderSize))
+
             return (
-              <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square} margin={this.state.squareMargin} squareSize={this.state.squareSize} onSquareClick={this.onSquareClick.bind(this)}/>
+              <SquareComponent key={'sqr_'+index} isVisible={isVisible} x={xy.i} y={xy.j} isAlive={!!square} margin={this.state.squareMargin} squareSize={this.state.squareSize} onSquareClick={this.onSquareClick.bind(this)}/>
             )
           })
         }
