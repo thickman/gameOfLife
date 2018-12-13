@@ -9,7 +9,7 @@ export default class BoardComponent extends React.Component {
     super(props);
 
     this.state = {
-      speed: 1000, //ms
+      speed: 100, //ms
       dimension: 40,
       dataBoard: [],
       startingCells: [],
@@ -24,7 +24,7 @@ export default class BoardComponent extends React.Component {
   }
 
   setStartingCells(){
-    const arr = PatternLibrary.TOAD;
+    const arr = PatternLibrary.GOSPER_GLIDER_GUN;
     arr.forEach(cell => this.addStartingCell(cell[0], cell[1]));
   }
 
