@@ -9,38 +9,29 @@ export default class BoardComponent extends React.Component {
     super(props);
 
     this.state = {
-      speed: 100, //ms
+      speed: 300, //ms
       dimension: 40,
+      squareSize: 20,
+      squareMargin: 5,
       dataBoard: [],
       startingCells: [],
       isRunning: false,
-      squareSize: 20,
-      squareMargin: 5,
       counter: 0
     }
-
-    this.setStartingCells();
-    this.initializeBoard();
+    this.initializeBoard(PatternLibrary.LIGHTWEIGHT_SPACESHIP);
   }
 
-  setStartingCells(){
-    const arr = PatternLibrary.GOSPER_GLIDER_GUN;
-    arr.forEach(cell => this.addStartingCell(cell[0], cell[1]));
-  }
+  initializeBoard(patternLib){
+    const startingCells = patternLib.cells;
+    startingCells.forEach(cell => this.addStartingCell(cell[0], cell[1]));
 
-  addStartingCell(i, j){
-    //ES6 shorthand object props assign
-    // same as {i: i, j: j}
-    const cells = this.state.startingCells;
-    cells.push(([i, j]));
+    if(patternLib.speed){
+      this.state = ({
+        ...this.state,
+        speed: patternLib.speed
+      })
+    }
 
-    this.state = ({
-      ...this.state,
-      startingCells: cells
-    })
-  }
-
-  initializeBoard(){
     const dimension = this.state.dimension; // pass as props.dimension
 
     const dataArr = [];
@@ -48,7 +39,6 @@ export default class BoardComponent extends React.Component {
 
     let i=0;
     let j=0;
-
 
     for(let k=0; k<dimension*dimension; k++) {
       makeAlive = this.state.startingCells.find(cell => cell[0] === i && cell[1] === j)
@@ -66,11 +56,24 @@ export default class BoardComponent extends React.Component {
     }
   }
 
+  addStartingCell(i, j){
+    //ES6 shorthand object props assign
+    // same as {i: i, j: j}
+    const cells = this.state.startingCells;
+    cells.push(([i, j]));
+
+    this.state = ({
+      ...this.state,
+      startingCells: cells
+    })
+  }
+
   get2d(k){
     const ij = k < this.state.dimension
       ? {i: k , j: 0}
       : {
-        i: k % this.state.dimension, j: Math.floor(k / this.state.dimension)
+        i: k % this.state.dimension,
+        j: Math.floor(k / this.state.dimension)
       }
       return ij;
   }
@@ -79,7 +82,7 @@ export default class BoardComponent extends React.Component {
     return j* this.state.dimension + i;
   }
 
-  liveNeighboursOf(i,j){
+  countLiveNeighboursOf(i,j){
     let dataBoard = this.state.dataBoard;
     let width = this.state.dimension;
     let hasUp, hasDown, hasLeft, hasRight;
@@ -148,7 +151,7 @@ export default class BoardComponent extends React.Component {
 
     const newDataBoard = arg.state.dataBoard.map((isAlive, index) => {
       const xy = arg.get2d(index);
-      const neighbourAmount = arg.liveNeighboursOf(xy.i, xy.j);
+      const neighbourAmount = arg.countLiveNeighboursOf(xy.i, xy.j);
 
       const makeAlive =
         (neighbourAmount === 3 && !isAlive) ||
@@ -166,12 +169,14 @@ export default class BoardComponent extends React.Component {
 
   onSquareClick(target){
 
+    // set board state before running
     if(this.state.isRunning) return;
 
     // we probably don't need to update that 2 lines as it's used only to initialise the board
     let cells = this.state.startingCells;
     const cellIndexInStartingArr = cells.findIndex(cell => (cell[0] === target.i && cell[1] === target.j));
 
+    // add or remove
     if(cellIndexInStartingArr === -1){
         cells.push(([target.i, target.j]));
     }
@@ -179,8 +184,8 @@ export default class BoardComponent extends React.Component {
       cells = cells.slice(0,cellIndexInStartingArr).concat(cells.slice(cellIndexInStartingArr+1, cells.length));
     }
 
-    let dataArr = this.state.dataBoard;
     const index = this.get1d(target.i, target.j);
+    let dataArr = this.state.dataBoard;
     dataArr[index] = !dataArr[index];
 
     this.setState({
@@ -212,7 +217,7 @@ export default class BoardComponent extends React.Component {
     const fillColour = 'white';
 
     // can we avoid passing this here and this calculation in order to center
-    const svgSize = (this.state.squareSize) * this.state.dimension + 2* this.state.squareMargin;
+    const svgSize = (this.state.squareSize) * this.state.dimension + 2 * this.state.squareMargin;
 
     const inlineStyle = {
       'backgroundColor':fillColour,
@@ -232,7 +237,14 @@ export default class BoardComponent extends React.Component {
           this.state.dataBoard.map((square, index) => {
             const xy = this.get2d(index);
             return (
-              <SquareComponent key={'sqr_'+index} x={xy.i} y={xy.j} isAlive={!!square} margin={this.state.squareMargin} squareSize={this.state.squareSize} onSquareClick={this.onSquareClick.bind(this)}/>
+              <SquareComponent
+                key={'sqr_'+index}
+                x={xy.i}
+                y={xy.j}
+                isAlive={!!square}
+                margin={this.state.squareMargin}
+                squareSize={this.state.squareSize}
+                onSquareClick={this.onSquareClick.bind(this)}/>
             )
           })
         }

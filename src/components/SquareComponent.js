@@ -19,9 +19,9 @@ export default class SquareComponent extends React.Component {
       y: this.props.y * 20 + margin + 'px',
       width: size + 'px',
       height: size+ 'px',
-      fill:fillColour,
-      strokeWidth:margin,
-      stroke:'rgb(0,0,0)'
+      fill: fillColour,
+      strokeWidth: margin,
+      stroke: 'rgb(0,0,0)'
     }
     return <rect width={size+'px'} height={size+'px'} style={inlineStyle} onClick={this.onClick.bind(this)}/>
   }
