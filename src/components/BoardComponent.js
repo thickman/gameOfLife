@@ -27,7 +27,7 @@ export default class BoardComponent extends React.Component {
     return this.props.defaultSpeed;
   }
 
-  getInitialBoard(patternLib){
+  getInitialBoard(){
     const dimension = this.props.dimension;
 
     const dataArr = [];
@@ -37,7 +37,7 @@ export default class BoardComponent extends React.Component {
     let j=0;
 
     for(let k=0; k<dimension*dimension; k++) {
-      makeAlive = this.props.initialPattern.cells.find(cell => cell[0] === i && cell[1] === j)
+      makeAlive = this.props.initialPattern.cells.some(cell => cell[0] === i && cell[1] === j)
       dataArr[k] = !!makeAlive;
       i++;
 
@@ -126,7 +126,7 @@ export default class BoardComponent extends React.Component {
   }
 
   calculateNewBoard(){
-    if(!this.state.dataBoard.find(cell => !!cell)){
+    if(!this.state.dataBoard.some(cell => !!cell)){
       return;
     }
 
@@ -144,17 +144,18 @@ export default class BoardComponent extends React.Component {
     return newDataBoard;
   }
 
-  onSquareClick(target){
+  addRemoveStartingCell(target){
     // set board state before running
-    if(this.state.isRunning) return;
+    if(this.state.isRunning) {
+      return;
+    }
 
     const currentCells = this.state.startingCells;
-    const cellIndexInStartingArr = currentCells.findIndex(cell => (cell[0] === target.i && cell[1] === target.j));
+    const targetCell = currentCells.find(cell => (cell[0] === target.i && cell[1] === target.j));
 
-    // add or remove
-    const newCells = cellIndexInStartingArr === -1
-      ? currentCells.concat([[target.i, target.j]])
-      : currentCells.slice(0,cellIndexInStartingArr).concat(currentCells.slice(cellIndexInStartingArr+1, currentCells.length));
+    const newCells = targetCell
+      ? currentCells.filter(cell => cell !== targetCell)
+      : currentCells.concat([[target.i, target.j]]);
 
     const index = this.get1d(target.i, target.j);
     const dataArr = this.state.dataBoard;
@@ -171,7 +172,9 @@ export default class BoardComponent extends React.Component {
   }
 
   clearStartingPos(){
-    if(this.state.isRunning) return;
+    if(this.state.isRunning) {
+      return
+    };
 
     this.setState({
       startingCells: [],
@@ -212,7 +215,7 @@ export default class BoardComponent extends React.Component {
                 isAlive={!!square}
                 margin={this.props.squareMargin}
                 squareSize={this.props.squareSize}
-                onSquareClick={this.onSquareClick.bind(this)}/>
+                onSquareClick={this.addRemoveStartingCell.bind(this)}/>
             )
           })
         }
@@ -236,7 +239,7 @@ export default class BoardComponent extends React.Component {
       setTimeout( () => {
         this.setState({
           dataBoard: this.calculateNewBoard(),
-          counter: this.state.counter+1
+          counter: this.state.counter + 1
         })
       }, this.state.speed)
     }
