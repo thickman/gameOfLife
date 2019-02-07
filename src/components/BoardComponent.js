@@ -9,30 +9,26 @@ export default class BoardComponent extends React.Component {
     super(props);
 
     this.state = {
-      speed: 300, //ms
-      dimension: 40,
-      squareSize: 20,
-      squareMargin: 5,
-      dataBoard: [],
-      startingCells: [],
+      speed: this.getSpeed(),
+      dataBoard: this.getInitialBoard(),
+      startingCells: props.initialPattern.cells,
       isRunning: false,
       counter: 0
     }
-    this.initializeBoard(PatternLibrary.LIGHTWEIGHT_SPACESHIP);
   }
 
-  initializeBoard(patternLib){
-    const startingCells = patternLib.cells;
-    startingCells.forEach(cell => this.addStartingCell(cell[0], cell[1]));
-
-    if(patternLib.speed){
-      this.state = ({
-        ...this.state,
-        speed: patternLib.speed
-      })
+  getSpeed(){
+    if(this.props.speed){
+        return this.props.speed;
     }
+    if(this.props.initialPattern.speed){
+      return this.props.initialPattern.speed
+    }
+    return this.props.defaultSpeed;
+  }
 
-    const dimension = this.state.dimension; // pass as props.dimension
+  getInitialBoard(patternLib){
+    const dimension = this.props.dimension;
 
     const dataArr = [];
     let makeAlive = false;
@@ -41,7 +37,7 @@ export default class BoardComponent extends React.Component {
     let j=0;
 
     for(let k=0; k<dimension*dimension; k++) {
-      makeAlive = this.state.startingCells.find(cell => cell[0] === i && cell[1] === j)
+      makeAlive = this.props.initialPattern.cells.find(cell => cell[0] === i && cell[1] === j)
       dataArr[k] = !!makeAlive;
       i++;
 
@@ -50,10 +46,9 @@ export default class BoardComponent extends React.Component {
         j++;
       }
     }
-    this.state  = {
-      ...this.state,
-      dataBoard: dataArr
-    }
+
+    return dataArr;
+
   }
 
   addStartingCell(i, j){
@@ -69,22 +64,22 @@ export default class BoardComponent extends React.Component {
   }
 
   get2d(k){
-    const ij = k < this.state.dimension
+    const ij = k < this.props.dimension
       ? {i: k , j: 0}
       : {
-        i: k % this.state.dimension,
-        j: Math.floor(k / this.state.dimension)
+        i: k % this.props.dimension,
+        j: Math.floor(k / this.props.dimension)
       }
       return ij;
   }
 
   get1d(i, j){
-    return j* this.state.dimension + i;
+    return j* this.props.dimension + i;
   }
 
   countLiveNeighboursOf(i,j){
     let dataBoard = this.state.dataBoard;
-    let width = this.state.dimension;
+    let width = this.props.dimension;
     let hasUp, hasDown, hasLeft, hasRight;
     const k = this.get1d(i, j);
 
@@ -143,7 +138,6 @@ export default class BoardComponent extends React.Component {
     return newDataBoardPrint;
   }
 
-
   calculateNewState(arg){
     if(!arg.state.dataBoard.find(cell => !!cell)){
       return;
@@ -160,11 +154,11 @@ export default class BoardComponent extends React.Component {
       return makeAlive;
     })
 
+    // TODO: let the function return newDataBoard and move below piece outside
     arg.setState({
       dataBoard: newDataBoard,
       counter: arg.state.counter+1
     })
-    return newDataBoard;
   }
 
   onSquareClick(target){
@@ -217,7 +211,7 @@ export default class BoardComponent extends React.Component {
     const fillColour = 'white';
 
     // can we avoid passing this here and this calculation in order to center
-    const svgSize = (this.state.squareSize) * this.state.dimension + 2 * this.state.squareMargin;
+    const svgSize = (this.props.squareSize) * this.props.dimension + 2 * this.props.squareMargin;
 
     const inlineStyle = {
       'backgroundColor':fillColour,
@@ -242,8 +236,8 @@ export default class BoardComponent extends React.Component {
                 x={xy.i}
                 y={xy.j}
                 isAlive={!!square}
-                margin={this.state.squareMargin}
-                squareSize={this.state.squareSize}
+                margin={this.props.squareMargin}
+                squareSize={this.props.squareSize}
                 onSquareClick={this.onSquareClick.bind(this)}/>
             )
           })
@@ -260,3 +254,11 @@ export default class BoardComponent extends React.Component {
     );
     }
 }
+
+BoardComponent.defaultProps = {
+  defaultSpeed: 300, //ms
+  dimension: 20,
+  squareSize: 20,
+  squareMargin: 5,
+  initialPattern: PatternLibrary.LIGHTWEIGHT_SPACESHIP,
+};
