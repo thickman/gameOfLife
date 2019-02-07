@@ -46,21 +46,8 @@ export default class BoardComponent extends React.Component {
         j++;
       }
     }
-
     return dataArr;
 
-  }
-
-  addStartingCell(i, j){
-    //ES6 shorthand object props assign
-    // same as {i: i, j: j}
-    const cells = this.state.startingCells;
-    cells.push(([i, j]));
-
-    this.state = ({
-      ...this.state,
-      startingCells: cells
-    })
   }
 
   get2d(k){
@@ -138,14 +125,14 @@ export default class BoardComponent extends React.Component {
     return newDataBoardPrint;
   }
 
-  calculateNewState(arg){
-    if(!arg.state.dataBoard.find(cell => !!cell)){
+  calculateNewBoard(){
+    if(!this.state.dataBoard.find(cell => !!cell)){
       return;
     }
 
-    const newDataBoard = arg.state.dataBoard.map((isAlive, index) => {
-      const xy = arg.get2d(index);
-      const neighbourAmount = arg.countLiveNeighboursOf(xy.i, xy.j);
+    const newDataBoard = this.state.dataBoard.map((isAlive, index) => {
+      const xy = this.get2d(index);
+      const neighbourAmount = this.countLiveNeighboursOf(xy.i, xy.j);
 
       const makeAlive =
         (neighbourAmount === 3 && !isAlive) ||
@@ -154,36 +141,27 @@ export default class BoardComponent extends React.Component {
       return makeAlive;
     })
 
-    // TODO: let the function return newDataBoard and move below piece outside
-    arg.setState({
-      dataBoard: newDataBoard,
-      counter: arg.state.counter+1
-    })
+    return newDataBoard;
   }
 
   onSquareClick(target){
-
     // set board state before running
     if(this.state.isRunning) return;
 
-    // we probably don't need to update that 2 lines as it's used only to initialise the board
-    let cells = this.state.startingCells;
-    const cellIndexInStartingArr = cells.findIndex(cell => (cell[0] === target.i && cell[1] === target.j));
+    const currentCells = this.state.startingCells;
+    const cellIndexInStartingArr = currentCells.findIndex(cell => (cell[0] === target.i && cell[1] === target.j));
 
     // add or remove
-    if(cellIndexInStartingArr === -1){
-        cells.push(([target.i, target.j]));
-    }
-    else{
-      cells = cells.slice(0,cellIndexInStartingArr).concat(cells.slice(cellIndexInStartingArr+1, cells.length));
-    }
+    const newCells = cellIndexInStartingArr === -1
+      ? currentCells.concat([[target.i, target.j]])
+      : currentCells.slice(0,cellIndexInStartingArr).concat(currentCells.slice(cellIndexInStartingArr+1, currentCells.length));
 
     const index = this.get1d(target.i, target.j);
-    let dataArr = this.state.dataBoard;
+    const dataArr = this.state.dataBoard;
     dataArr[index] = !dataArr[index];
 
     this.setState({
-      startingCells: cells,
+      startingCells: newCells,
       dataBoard: dataArr
     })
   }
@@ -219,10 +197,6 @@ export default class BoardComponent extends React.Component {
       height: `${svgSize}px`
     }
 
-    if(this.state.isRunning){
-        setTimeout(this.calculateNewState, this.state.speed, this);
-    }
-
     return (
       <div className='board-container'>
         <div className='label'><p>Game of Life</p></div>
@@ -252,6 +226,19 @@ export default class BoardComponent extends React.Component {
         <p>{JSON.stringify(this.state.startingCells)}</p>
       </div>
     );
+    }
+
+    componentDidUpdate(prevProps){
+      if(!this.state.isRunning){
+        return;
+      }
+
+      setTimeout( () => {
+        this.setState({
+          dataBoard: this.calculateNewBoard(),
+          counter: this.state.counter+1
+        })
+      }, this.state.speed)
     }
 }
 
