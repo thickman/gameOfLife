@@ -27,6 +27,7 @@ export default class BoardComponent extends React.Component {
     return this.props.defaultSpeed;
   }
 
+  // TODO: try to make below function functional (only if it improves readability
   getInitialBoard(){
     const dimension = this.props.dimension;
 
@@ -37,7 +38,10 @@ export default class BoardComponent extends React.Component {
     let j=0;
 
     for(let k=0; k<dimension*dimension; k++) {
-      makeAlive = this.props.initialPattern.cells.some(cell => cell[0] === i && cell[1] === j)
+      makeAlive = this.props.initialPattern.cells.some(
+        cell => cell[0] === i && cell[1] === j
+      );
+
       dataArr[k] = !!makeAlive;
       i++;
 
